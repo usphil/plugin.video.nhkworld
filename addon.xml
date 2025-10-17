@@ -10,8 +10,8 @@
     </requires>
 
     <extension point="xbmc.python.pluginsource"
-               library="default.py"
-               provides="video" />
+               library="default.py">
+        <provides>video</provides>
 
     <extension point="xbmc.addon.metadata">
         <summary lang="en">Watch NHK World Live TV and News</summary>
