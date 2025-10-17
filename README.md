@@ -48,6 +48,23 @@ LibreELEC
 Windows 10/11
 Ubuntu 22.04
 
+## 🌐 DNS Optimization (Recommended)
+If you ever encounter the error: 
+NameResolutionError: Failed to resolve 'media-tyo.hls.nhkworld.jp'
+or program lists load slowly 
+this is most likely due to your Internet provider’s default DNS server being slow or restrictive.
+
+✅ **Recommended fix:**  
+Change your device to use a faster, public DNS service.
+
+| Provider | Primary DNS | Secondary DNS |
+|-----------|--------------|---------------|
+| **Cloudflare** | 1.1.1.1 | 1.0.0.1 |
+| **Google DNS** | 8.8.8.8 | 8.8.4.4 |
+| **Quad9 (Secure)** | 9.9.9.9 | 149.112.112.112 |
+
+💡 Even if the addon works normally, switching to a faster DNS (like Cloudflare or Google) is **highly recommended** — it improves connection stability, API response speed, and live-stream playback performance.
+
 🧾 Changelog
 v1.0.0 — Initial Release
 Added Live TV (1080p with fallback)
