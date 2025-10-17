@@ -1,2 +1,67 @@
-# plugin.video.nhkworld
-Stream NHK World live (1080p), browse programs and categories, and watch the latest NHK news by region. Includes multilingual interface support.
+# NHK World Kodi Addon
+
+Watch **NHK World Live TV**, news, and on-demand programs directly in **Kodi**.  
+This addon retrieves official NHK World content from public NHK APIs, with multilingual support.
+
+---
+
+## ✨ Features
+
+- 🎥 **NHK World Live TV** — Full HD (1080p) stream with automatic fallback to 720p  
+- 🗂️ **Programs** — Browse NHK World programs by category or show  
+- 📰 **News** — Latest NHK World news videos (Japan, Asia, World, etc.)  
+- 🔍 **Search** — Find NHK videos and news by keyword  
+- 🌐 **Multilingual Interface** — Choose from 15+ supported languages  
+- 🧩 **CoreELEC / LibreELEC Compatible** — Optimized for embedded Kodi systems  
+
+---
+
+## ⚙️ Installation
+
+1. Download or clone this repository:
+   ```bash
+   git clone https://github.com/usphil/plugin.video.nhkworld.git
+2. Copy the folder plugin.video.nhkworld into your Kodi addons directory:
+    Kodi/addons/
+3. Restart Kodi → Go to: Add-ons → Video Add-ons → NHK World
+
+🧠 Technical Notes
+Live stream URLs are dynamically parsed from
+https://www3.nhk.or.jp/nhkworld/common/assets/live/js/main.js
+ensuring up-to-date sources.
+Stream preference order: 
+1080p (.../o-master.m3u8)
+Parsed fallback (720p)
+Static backup URL
+Supports application/x-mpegURL for inputstream.adaptive
+
+⚙️ Settings
+Content Language: Choose your preferred NHK World language
+Font Tip: When using Japanese, Chinese, or Korean, set your Kodi font to Arial for best display.
+
+🧩 Compatibility
+Kodi 20.x “Nexus”
+Kodi 21.x “Omega”
+Tested on:
+CoreELEC 21.2
+LibreELEC
+Windows 10/11
+Ubuntu 22.04
+
+🧾 Changelog
+v1.0.0 — Initial Release
+Added Live TV (1080p with fallback)
+Added Programs and Categories
+Added News by region and Top News
+Added Multilingual UI and font switching logic
+Added Smart Search (auto-play videos)
+Code cleanup and optimized load speed
+
+📜 License
+This project uses publicly accessible NHK World web data.
+It is not affiliated with or endorsed by NHK.
+For personal and educational use only.
+
+👨‍💻 Author
+
+Developed and maintained by usphil
