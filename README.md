@@ -25,16 +25,6 @@ This addon retrieves official NHK World content from public NHK APIs, with multi
     Kodi/addons/
 3. Restart Kodi → Go to: Add-ons → Video Add-ons → NHK World
 
-🧠 Technical Notes
-Live stream URLs are dynamically parsed from
-https://www3.nhk.or.jp/nhkworld/common/assets/live/js/main.js
-ensuring up-to-date sources.
-Stream preference order: 
-1080p (.../o-master.m3u8)
-Parsed fallback (720p)
-Static backup URL
-Supports application/x-mpegURL for inputstream.adaptive
-
 ⚙️ Settings
 Content Language: Choose your preferred NHK World language
 Font Tip: When using Japanese, Chinese, or Korean, set your Kodi font to Arial for best display.
