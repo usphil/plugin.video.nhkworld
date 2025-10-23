@@ -43,7 +43,45 @@ LANG_MAP = {
 }
 
 UI_STRINGS = {
-    "Latest Videos": {
+    "Latest_Shows": {
+        "en": "Latest Videos",
+        "ja": "最新の番組",
+        "zh": "最新节目",
+        "zt": "最新節目",
+        "ko": "최신 쇼",
+        "es": "Últimos programas",
+        "fr": "Derniers spectacles",
+        "pt": "Últimos Shows",
+        "ru": "Последние шоу",
+        "uk": "Останні шоу",
+        "ar": "أحدث العروض",
+        "hi": "नवीनतम शो",
+        "th": "รายการล่าสุด",
+        "my": "နောက်ဆုံးထွက်ရှိုးများ",
+        "id": "Acara Terbaru",
+        "tr": "Son Gösteriler",
+        "vi": "Chương trình mới nhất"
+    },
+    "Trending": {
+        "en": "Latest Videos",
+        "ja": "トレンド",
+        "zh": "热门内容",
+        "zt": "熱門內容",
+        "ko": "트렌드",
+        "es": "Tendencias",
+        "fr": "Tendance",
+        "pt": "Tendências",
+        "ru": "В тренде",
+        "uk": "Тренди",
+        "ar": "الأكثر رواجًا",
+        "hi": "रुझान",
+        "th": "กำลังเป็นที่นิยม",
+        "my": "ခေတ်စားနေသည်။",
+        "id": "Sedang tren",
+        "tr": "Trend olan",
+        "vi": "Xu hướng"
+    },
+    "Latest_Videos": {
         "en": "Latest Videos",
         "ja": "最新動画",
         "zh": "最新视频",
@@ -60,7 +98,7 @@ UI_STRINGS = {
         "my": "နောက်ဆုံးဗီဒီယိုများ",
         "id": "Video Terbaru",
         "tr": "Son Videolar",
-        "vi": "Mới Nhất"
+        "vi": "Video Mới Nhất"
     },
     "Categories": {
         "en": "Categories",
@@ -118,6 +156,25 @@ UI_STRINGS = {
         "tr": "NHK World'ün isteğe bağlı en son videolarına göz atın",
         "uk": "Перегляньте найновіші відео NHK World на вимогу",
         "vi":"Duyệt các video mới nhất của NHK World"
+    },
+    "Plot_show": {
+        "en": "Browse NHK World latest shows",
+        "ja": "NHKワールドの最新番組を閲覧",
+        "zh": "浏览 NHK World 的最新节目",
+        "zt": "瀏覽 NHK World 的最新節目",
+        "ko": "NHK World 최신 프로그램 탐색",
+        "es": "Explora los últimos programas de NHK World",
+        "fr": "Parcourir les dernières émissions de NHK World",
+        "pt": "Parcourir les dernières émissions de NHK World",
+        "ru": "Просмотрите последние шоу NHK World",
+        "ar": "تصفح أحدث عروض NHK World",
+        "hi": "एनएचके वर्ल्ड के नवीनतम शो ब्राउज़ करें",
+        "th": "เรียกดูรายการล่าสุดของ NHK World",
+        "my": "NHK World နောက်ဆုံးထွက်ရှိုးများကို ကြည့်ပါ။",
+        "id": "Telusuri acara terbaru NHK World",
+        "tr": "NHK World'ün en son programlarına göz atın",
+        "uk": "Перегляньте останні шоу NHK World",
+        "vi":"Duyệt các chương trình mới nhất của NHK World"
     },
     "Search": {
         "en": "Search",
