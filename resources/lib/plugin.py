@@ -245,13 +245,18 @@ class myAddon(helper.myAddon):
             xbmcgui.Dialog().notification("NHK Error", str(e), xbmcgui.NOTIFICATION_ERROR)
             return ilist
 
+        if "/en/" in url:
+            API_URL = API_BASE
+        else:
+            API_URL = API_BASE_LANG
+
         for prog in data.get("items", []):
             pid = prog.get("id")
             title = prog.get("title").replace('\n', ' - ')
             desc = prog.get("description")
             thumb = NHK_BASE + prog["images"]["landscape"][1]["url"] if prog.get("images") else self.addonIcon
             fanart = NHK_BASE + prog["images"]["landscape"][-1]["url"] if prog.get("images") else self.addonFanart
-            episodes_api = f"{API_BASE}/video_programs/{pid}/video_episodes"
+            episodes_api = f"{API_URL}/video_programs/{pid}/video_episodes"
             total_video = prog.get("video_episodes",{})["total"]
             info = {
                 "Title": title,
