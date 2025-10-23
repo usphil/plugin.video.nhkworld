@@ -114,6 +114,7 @@ class myAddon(object):
             'GC': [self.getAddonCats, 'files'],
             'GE': [self.getAddonEpisodes, 'episodes'],
             'SE': [self.getAddonSearch, 'files'],
+            'GS': [self.getAddonShows, 'tvshows'],
             'SR': [self.getSearchResult, 'videos'],
             'NM': [self.getNewsMenu, 'files'],
             'NC': [self.get_news, 'videos'],
@@ -131,7 +132,7 @@ class myAddon(object):
                 parms[key] = urllib.parse.unquote_plus(parms[key])
         fun = mtable.get(parms.get('mode'))
         if fun:
-            self.procDir(fun[0], parms.get('url'), fun[1])
+            self.procDir(fun[0], parms.get('url',''), fun[1])
         else:
             fun = ftable.get(parms.get('mode'))
             if fun:
@@ -141,6 +142,7 @@ class myAddon(object):
     def getAddonMenu(self, url, ilist): return ilist
     def getAddonCats(self, url, ilist): return ilist
     def getAddonEpisodes(self, url, ilist): return ilist
+    def getAddonShows(self, url, ilist): return ilist
     def getNewsMenu(self, url, ilist): return ilist
     def get_news(self, url, ilist): return ilist
     def get_PlayNews(self, url): pass

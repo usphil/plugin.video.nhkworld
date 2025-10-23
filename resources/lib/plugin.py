@@ -11,9 +11,12 @@ lang_code = get_lang_code(addon)
 API_BASE_LANG = f"https://api.nhkworld.jp/showsapi/v1/{lang_code}"
 
 CAT = _("Categories", lang_code)
-LATEST = _("Latest Videos", lang_code)
+LATEST_VID = _("Latest_Videos", lang_code)
+LATEST_SHOWS = _("Latest_Shows", lang_code)
+TREN= _("Trending", lang_code)
 PLOT_CAT = _("Plot_cat", lang_code)
 PLOT_VID = _("Plot_vid", lang_code)
+PLOT_SHOW = _("Plot_show", lang_code)
 use_color = addon.getSetting('usecolor')
 
 def color(name,c=''):
@@ -171,6 +174,14 @@ class myAddon(helper.myAddon):
         info = {"Title": "News", "Plot": "NHK World latest news videos"}
         ilist = self.addDir("NHK News", "NM", ilist, "news", img, fanart, info)
 
+        programs_url = f"{API_BASE}/video_programs?limit=100&sort=-date"
+        info = {"Title": "Video Programs", "Plot": "Browse NHK World on-demand video programs"}
+        ilist = self.addDir(color("Latest Shows","orange"), "GS", ilist, programs_url, img, fanart, info)
+
+        programs_url = f"{API_BASE}/video_programs?limit=10&sort=trending"
+        info = {"Title": "Video Programs", "Plot": "Browse NHK World trending programs"}
+        ilist = self.addDir(color("Trending","orange"), "GS", ilist, programs_url, img, fanart, info)
+
         videos_url = f"{API_BASE}/video_episodes?limit=100&offset=0"
         info = {"Title": "Latest Videos", "Plot": "Browse NHK World on-demand latest videos"}
         ilist = self.addDir(color("Latest Videos", "orange"), "GE", ilist, videos_url, img, fanart, info)
@@ -178,13 +189,16 @@ class myAddon(helper.myAddon):
         cat_url = f"{API_BASE}/categories/"
         info = {"Title": "Categories", "Plot": "Explore NHK World programs by category"}
         ilist = self.addDir(color("Categories", "orange"), "GC", ilist, cat_url, img, fanart, info)
-        
+
         ilist = self.addDir("---> The items below are for some other languages.", "", ilist, "", img, fanart)
 
+        programs_url = f"{API_BASE_LANG}/video_programs?limit=100&sort=-date"
+        info = {"Title": LATEST_SHOWS, "Plot": PLOT_SHOW}
+        ilist = self.addDir(color(LATEST_SHOWS,"cyan"), "GS", ilist, programs_url, img, fanart, info)
 
         videos_url = f"{API_BASE_LANG}/video_episodes?limit=100&offset=0"
-        info = {"Title": LATEST, "Plot": PLOT_VID}
-        ilist = self.addDir(color(LATEST, "cyan"), "GE", ilist, videos_url, img, fanart, info)
+        info = {"Title": LATEST_VID, "Plot": PLOT_VID}
+        ilist = self.addDir(color(LATEST_VID, "cyan"), "GE", ilist, videos_url, img, fanart, info)
 
         cat_url = f"{API_BASE_LANG}/categories/"
         info = {"Title": CAT, "Plot": PLOT_CAT}
@@ -220,6 +234,52 @@ class myAddon(helper.myAddon):
             }
             ilist = self.addMenuItem(cat_name, "GE", ilist, cat_api, cat_thumb, cat_fanart, info, isFolder=True)
         return ilist
+
+
+    # ========== PROGRAM LIST ==========
+    def getAddonShows(self, url, ilist):
+        """Display video programs in a category"""
+        try:
+            data = requests.get(url, headers=self.defaultHeaders, timeout=10).json()
+        except Exception as e:
+            xbmcgui.Dialog().notification("NHK Error", str(e), xbmcgui.NOTIFICATION_ERROR)
+            return ilist
+
+        for prog in data.get("items", []):
+            pid = prog.get("id")
+            title = prog.get("title").replace('\n', ' - ')
+            desc = prog.get("description")
+            thumb = NHK_BASE + prog["images"]["landscape"][1]["url"] if prog.get("images") else self.addonIcon
+            fanart = NHK_BASE + prog["images"]["landscape"][-1]["url"] if prog.get("images") else self.addonFanart
+            episodes_api = f"{API_BASE}/video_programs/{pid}/video_episodes"
+            total_video = prog.get("video_episodes",{})["total"]
+            info = {
+                "Title": title,
+                "Plot": desc,
+                "mediatype": "tvshow",
+            }
+            if total_video == 0:
+                continue
+            ilist = self.addMenuItem(title, "GE", ilist, episodes_api, thumb, fanart, info, isFolder=True)
+
+        # --- pagination link ---
+        try:
+            pagination = data.get("pagination", {})
+            next_url = pagination.get("next")
+            total = pagination.get("total")
+            offset = pagination.get("offset")
+            limit = pagination.get("limit")
+            page = round(int(offset)/int(limit))+1
+            total_page = round(int(total)/int(limit))+1
+            thumb = "https://filedn.com/lXWPrdig44P7DGUkOEDrKLm/nhk/nextpage.jpg"
+            if next_url:
+                next_url = f'https://api.nhkworld.jp{pagination.get("next")}'
+                ilist = self.addMenuItem(color(f">> Next Page {page+1}/{total_page}", "yellow"), "GS", ilist, next_url, thumb, fanart, {"Title": "Next Page"}, isFolder=True)
+        except:
+            logs('No more page')
+            
+        return ilist
+
 
     # ========== EPISODE LIST ==========
     def getAddonEpisodes(self, url, ilist):
@@ -266,21 +326,13 @@ class myAddon(helper.myAddon):
             limit = pagination.get("limit")
             page = round(int(offset)/int(limit))+1
             total_page = round(int(total)/int(limit))+1
+            thumb = "https://filedn.com/lXWPrdig44P7DGUkOEDrKLm/nhk/nextpage.jpg"
             if next_url:
                 next_url = f'https://api.nhkworld.jp{pagination.get("next")}'
-                
-                ilist = self.addMenuItem(
-                    f"[COLOR yellow]>> Next Page {page+1}/{total_page}[/COLOR]",
-                    "GE",
-                    ilist,
-                    next_url,
-                    "https://filedn.com/lXWPrdig44P7DGUkOEDrKLm/nhk/nextpage.jpg",
-                    fanart,
-                    {"Title": "Next Page"},
-                    isFolder=True,
-                )
+                ilist = self.addMenuItem(color(f">> Next Page {page+1}/{total_page}", "yellow"), "GS", ilist, next_url, thumb, fanart, {"Title": "Next Page"}, isFolder=True)
         except:
             logs('No more page')
+            
         return ilist
 
     def changeLanguageAndFont(self, url=None):
