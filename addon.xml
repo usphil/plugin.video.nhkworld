@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.nhkworld"
        name="NHK World"
-       version="1.0.0"
+       version="1.0.1"
        provider-name="usphil">
     <requires>
         <import addon="xbmc.python" version="3.0.0" />
@@ -13,7 +13,7 @@
                library="default.py">
         <provides>video</provides>
     </extension>
-
+        
     <extension point="xbmc.addon.metadata">
         <summary lang="en">Watch NHK World Live TV and News</summary>
         <description lang="en">
@@ -30,6 +30,7 @@
         </assets>
         <news>
             v1.0.0 — Initial release (Live TV, Programs, News, Search, Multilingual)
+            v1.0.1 — Lastest Shows, Trending added
         </news>
     </extension>
 </addon>
