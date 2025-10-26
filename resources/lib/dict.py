@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-        
+import xbmcaddon
+
 CJK_LANGS = ["ja", "zh", "zt", "ko", "ar", "th", "my", "hi"]
 
 LANG_OPTIONS = [
@@ -43,8 +44,8 @@ LANG_MAP = {
 }
 
 UI_STRINGS = {
-    "Latest_Shows": {
-        "en": "Latest Videos",
+    "Latest Shows": {
+        "en": "Latest Shows",
         "ja": "最新の番組",
         "zh": "最新节目",
         "zt": "最新節目",
@@ -63,7 +64,7 @@ UI_STRINGS = {
         "vi": "Chương trình mới nhất"
     },
     "Trending": {
-        "en": "Latest Videos",
+        "en": "Trending",
         "ja": "トレンド",
         "zh": "热门内容",
         "zt": "熱門內容",
@@ -81,7 +82,7 @@ UI_STRINGS = {
         "tr": "Trend olan",
         "vi": "Xu hướng"
     },
-    "Latest_Videos": {
+    "Latest Videos": {
         "en": "Latest Videos",
         "ja": "最新動画",
         "zh": "最新视频",
@@ -119,7 +120,7 @@ UI_STRINGS = {
         "uk": "Категорії",
         "vi":"Thể Loại"
     },
-    "Plot_cat": {
+    "Category Plot": {
         "en": "Explore NHK World programs by category",
         "ja": "NHKワールドの番組をカテゴリー別に探す",
         "zh": "按类别浏览 NHK World 节目",
@@ -138,7 +139,7 @@ UI_STRINGS = {
         "uk": "Ознайомтеся з програмами NHK World за категоріями",
         "vi":"Khám phá các chương trình của NHK World theo thể loại"
     },
-    "Plot_vid": {
+    "Video Plot": {
         "en": "Browse NHK World on-demand latest videos",
         "ja": "NHKワールドオンデマンドの最新動画を閲覧",
         "zh": "浏览 NHK World 点播最新视频",
@@ -157,7 +158,7 @@ UI_STRINGS = {
         "uk": "Перегляньте найновіші відео NHK World на вимогу",
         "vi":"Duyệt các video mới nhất của NHK World"
     },
-    "Plot_show": {
+    "Show Plot": {
         "en": "Browse NHK World latest shows",
         "ja": "NHKワールドの最新番組を閲覧",
         "zh": "浏览 NHK World 的最新节目",
@@ -176,22 +177,140 @@ UI_STRINGS = {
         "uk": "Перегляньте останні шоу NHK World",
         "vi":"Duyệt các chương trình mới nhất của NHK World"
     },
-    "Search": {
-        "en": "Search",
-        "ja": "検索",
-        "vi": "Tìm kiếm",
-        "zh": "搜索",
-        "zt": "搜尋",
-        "ko": "검색",
+    "NHK News": {
+        "en": "NHK News",
+        "ja": "NHKニュース",
+        "zh": "NHK新闻",
+        "zt": "NHK新聞",
+        "ko": "NHK 뉴스",
+        "es": "Noticias NHK",
+        "fr": "NHK News",
+        "pt": "Notícias da NHK",
+        "ru": "Новости NHK",
+        "ar": "أخبار NHK",
+        "hi": "एनएचके न्यूज़",
+        "th": "ข่าว NHK",
+        "my": "NHK သတင်း",
+        "id": "Berita NHK",
+        "tr": "NHK Haberleri",
+        "uk": "Новини NHK",
+        "vi":"Tin tức NHK"
     },
-    "Live Now": {
-        "en": "Live Now",
-        "ja": "ライブ放送中",
-        "vi": "Trực tiếp",
-        "zh": "正在直播",
-        "zt": "現正直播",
-        "ko": "실시간 방송",
+    "All News Videos": {
+        "en": "All News Videos",
+        "ja": "すべてのニュース動画",
+        "zh": "所有新闻视频",
+        "zt": "所有新聞視頻",
+        "ko": "모든 뉴스 영상",
+        "es": "Todos los videos de noticias",
+        "fr": "Toutes les vidéos d'actualité",
+        "pt": "Todos os vídeos de notícias",
+        "ru": "Все новостные видео",
+        "ar": "جميع مقاطع الفيديو الإخبارية",
+        "hi": "सभी समाचार वीडियो",
+        "th": "วิดีโอข่าวทั้งหมด",
+        "my": "သတင်းဗီဒီယိုအားလုံး",
+        "id": "Semua Video Berita",
+        "tr": "Tüm Haber Videoları",
+        "uk": "Усі відео новини",
+        "vi":"Tất cả video tin tức"
     },
+    "Japan": {
+        "en": "Japan",
+        "ja": "日本",
+        "zh": "日本",
+        "zt": "日本",
+        "ko": "일본",
+        "es": "Japón",
+        "fr": "Japon",
+        "pt": "Japão",
+        "ru": "Япония",
+        "ar": "اليابان",
+        "hi": "जापान",
+        "th": "ญี่ปุ่น",
+        "my": "ဂျပန်",
+        "id": "Jepang",
+        "tr": "Japonya",
+        "uk": "Японія",
+        "vi":"Nhật Bản"
+    },
+    "Asia": {
+        "en": "Asia",
+        "ja": "アジア",
+        "zh": "亚洲",
+        "zt": "亞洲",
+        "ko": "아시아",
+        "es": "Asia",
+        "fr": "Asie",
+        "pt": "Ásia",
+        "ru": "Азия",
+        "ar": "آسيا",
+        "hi": "एशिया",
+        "th": "เอเชีย",
+        "my": "အာရှ",
+        "id": "Asia",
+        "tr": "Asya",
+        "uk": "Азія",
+        "vi":"Châu Á"
+    },
+    "World": {
+        "en": "World",
+        "ja": "世界",
+        "zh": "世界",
+        "zt": "世界",
+        "ko": "세계",
+        "es": "Mundo",
+        "fr": "Monde",
+        "pt": "Mundo",
+        "ru": "Мир",
+        "ar": "العالم",
+        "hi": "विश्व",
+        "th": "โลก",
+        "my": "ကမ္ဘာ့",
+        "id": "Dunia",
+        "tr": "Dünya",
+        "uk": "Світ",
+        "vi":"Thế giới"
+    },
+    "Business & Tech": {
+        "en": "Business & Tech",
+        "ja": "ビジネス＆テクノロジー",
+        "zh": "商业与科技",
+        "zt": "商業與科技",
+        "ko": "비즈니스 및 기술",
+        "es": "Negocios y tecnología",
+        "fr": "Économie et technologie",
+        "pt": "Negócios e Tecnologia",
+        "ru": "Бизнес и технологии",
+        "ar": "الأعمال والتكنولوجيا",
+        "hi": "व्यापार और तकनीक",
+        "th": "ธุรกิจและเทคโนโลยี",
+        "my": "စီးပွားရေးနှင့် နည်းပညာ",
+        "id": "Bisnis & Teknologi",
+        "tr": "İş ve Teknoloji",
+        "uk": "Бізнес і технології",
+        "vi":"Kinh doanh & Công nghệ"
+    },
+    "Special Clips": {
+        "en": "Special Clips",
+        "ja": "スペシャルクリップ",
+        "zh": "特别片段",
+        "zt": "特別片段",
+        "ko": "특별 클립",
+        "es": "Clips especiales",
+        "fr": "Extraits spéciaux",
+        "pt": "Clipes Especiais",
+        "ru": "Специальные клипы",
+        "ar": "مقاطع خاصة",
+        "hi": "विशेष क्लिप",
+        "th": "คลิปพิเศษ",
+        "my": "အထူးဗီဒီယိုအပိုင်းများ",
+        "id": "Klip Spesial",
+        "tr": "Özel Klipler",
+        "uk": "Спеціальні відео",
+        "vi":"Đoạn phim đặc biệt"
+    },
+
 }
 
 def _(key, lang):
@@ -206,4 +325,20 @@ def get_lang_code(addon):
     except Exception:
         return "en"
 
+addon = xbmcaddon.Addon()
+lang_code = get_lang_code(addon)
 
+CATEGORIES = _("Categories", lang_code)
+LATEST_VIDEOS = _("Latest Videos", lang_code)
+LATEST_SHOWS = _("Latest Shows", lang_code)
+TRENDING= _("Trending", lang_code)
+CATEGORY_PLOT= _("Category Plot", lang_code)
+VIDEO_PLOT = _("Video Plot", lang_code)
+SHOW_PLOT = _("Show Plot", lang_code)
+NHK_NEWS =_("NHK News", lang_code)
+ALL_NEW_VIDEOS =_("All News Videos", lang_code)
+JAPAN =_("Japan", lang_code)
+ASIA =_("Asia", lang_code)
+WORLD =_("World", lang_code)
+BUSINESS_TECH =_("Business & Tech", lang_code)
+SPECIAL_CLIPS =_("Special Clips", lang_code)

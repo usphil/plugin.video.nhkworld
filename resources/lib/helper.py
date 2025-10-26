@@ -11,7 +11,7 @@ class myAddon(object):
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0 Safari/537.36'
         }
     
-    def addMenuItem(self, name, mode, ilist, url, icon, fanart, infoLabels=None, isFolder=True):
+    def addMenuItem(self, name, mode, ilist, url, img, fanart, infoLabels=None, isFolder=True):
         li = xbmcgui.ListItem(label=name)
         if infoLabels:
             tag = li.getVideoInfoTag()
@@ -53,7 +53,7 @@ class myAddon(object):
                         pass
 
             if 'mediatype' in infoLabels: tag.setMediaType(infoLabels['mediatype'])
-        if icon: li.setArt({'thumb': icon, 'icon': icon, 'poster': icon})
+        if img: li.setArt({'thumb': img, 'icon': img, 'poster': img})
         if fanart: li.setArt({'fanart': fanart})
         u = f"{sys.argv[0]}?mode={mode}&url={urllib.parse.quote(str(url), safe='')}"
 
@@ -76,8 +76,11 @@ class myAddon(object):
         ilist.append((u, liz, isFolder))
         return ilist
         
-    def addEpisode(self, name, mode, ilist, url, img, fanart, infoLabels=None):
-        u = f"{sys.argv[0]}?mode={mode}&url={urllib.parse.quote(str(url), safe='')}"
+    def addEpisode(self, name, mode, ilist, url, img, fanart, infoLabels=None, extra=None):
+        query = {"mode": mode, "url": url}
+        if extra:
+            query.update(extra)
+        u = sys.argv[0] + "?" + urllib.parse.urlencode(query)
         liz = xbmcgui.ListItem(label=name, path=url)
         liz.setProperty("IsPlayable", "true")
         liz.setArt({'thumb': img, 'icon': img, 'fanart': fanart})
@@ -100,6 +103,7 @@ class myAddon(object):
         xbmcplugin.addDirectoryItems(int(sys.argv[1]), ilist, len(ilist))
         xbmcplugin.setContent(int(sys.argv[1]), 'videos')
         xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=False)
+        # xbmc.executebuiltin('Container.SetViewMode(516)')  # for Titan Skin
 
     def procDir(self, func, url, ctype):
         ilist = []
@@ -110,44 +114,67 @@ class myAddon(object):
 
     def processAddonEvent(self):
         mtable = {
-            None: [self.getAddonMenu, 'files'],
-            'GC': [self.getAddonCats, 'files'],
-            'GE': [self.getAddonEpisodes, 'episodes'],
-            'SE': [self.getAddonSearch, 'files'],
-            'GS': [self.getAddonShows, 'tvshows'],
-            'SR': [self.getSearchResult, 'videos'],
-            'NM': [self.getNewsMenu, 'files'],
-            'NC': [self.get_news, 'videos'],
+            None: [self.MainMenu, 'files'],
+            'CATEGORIES': [self.Categories, 'files'],
+            'EPISODES_LIST': [self.EpisodesList, 'episodes'],
+            'SHOWS_LIST': [self.ShowsList, 'tvshows'],
+            'SEARCH_NEWS_RESULT': [self.SearchNewsResult, 'videos'],
+            'SEARCH_SHOWS_RESULT': [self.SearchShowsResult, 'videos'],
+            'SEARCH_ALL': [self.SearchAll, 'file'],
+            'SEARCH_HUB': [self.SearchHub, 'files'],
+            'SEARCH_ALL_KEYBOARD': [self.SearchKeyboard, 'files'],
+            'SEARCH_ALL_MENU': [self.SearchAllMenu, 'files'],
+            'NEWS_MENU': [self.NewsMenu, 'files'],
+            'NEWS_LIST': [self.NewsList, 'videos'],
+            'SCHEDULE_DAYS': [self.ScheduleDays, 'files'],
+            'SCHEDULE_ITEMS': [self.ScheduleItems, 'files'],
+            'SECOND_LANG': [self.SecondLang, 'files'],
+            'CLEAR_HISTORY': [self.ClearHistory, 'files'],
+            'DELETE_KEYWORD': [self.DeleteKeyword, 'files'],
         }
         ftable = {
-            'NT': self.get_PlayNews,
-            'GV': self.get_PlayEpisode,
-            'CL': self.changeLanguageAndFont,
-            'DF': self.doFunction
+            'PLAY_NEWS': self.PlayNews,
+            'PLAY_EPISODE': self.PlayEpisode,
+            'CHANGE_LANG': self.changeLanguageAndFont,
         }
         parms = {}
+        
         if len((sys.argv[2][1:])) > 0:
             parms = dict(arg.split("=") for arg in ((sys.argv[2][1:]).split("&")))
             for key in parms:
                 parms[key] = urllib.parse.unquote_plus(parms[key])
-        fun = mtable.get(parms.get('mode'))
+
+        mode = parms.get('mode')
+        fun = mtable.get(mode)
+        
+        if mode is None:
+            self._search_active = False
+            
         if fun:
             self.procDir(fun[0], parms.get('url',''), fun[1])
         else:
-            fun = ftable.get(parms.get('mode'))
+            fun = ftable.get(mode)
             if fun:
                 fun(parms.get('url'))
 
     # Placeholder functions (addon implements these)
-    def getAddonMenu(self, url, ilist): return ilist
-    def getAddonCats(self, url, ilist): return ilist
-    def getAddonEpisodes(self, url, ilist): return ilist
-    def getAddonShows(self, url, ilist): return ilist
-    def getNewsMenu(self, url, ilist): return ilist
-    def get_news(self, url, ilist): return ilist
-    def get_PlayNews(self, url): pass
-    def get_PlayEpisode(self, url): pass
+    def MainMenu(self, url, ilist): return ilist
+    def Categories(self, url, ilist): return ilist
+    def EpisodesList(self, url, ilist): return ilist
+    def ShowsList(self, url, ilist): return ilist
+    def NewsMenu(self, url, ilist): return ilist
+    def NewsList(self, url, ilist): return ilist
+    def ScheduleDays(self, url, ilist): return ilist
+    def ScheduleItems(self, url, ilist): return ilist
+    def PlayNews(self, url): pass
+    def PlayEpisode(self, params): pass
+    def ClearHistory(self, url, ilist): return ilist
     def changeLanguageAndFont(self,url): pass
-    def doFunction(self, url): pass
-    def getAddonSearch(self, url, ilist): return ilist
-    def getSearchResult(self, url, ilist): return ilist
+    def SearchShows(self, url, ilist): return ilist
+    def SearchAllMenu(self, url, ilist): return ilist
+    def SearchHub(self, url, ilist): return ilist
+    def SearchKeyboard(self, url, ilist): return ilist
+    def SearchAll(self, url, ilist): return ilist
+    def SearchNewsResult(self, url, ilist): return ilist
+    def SearchShowsResult(self, url, ilist): return ilist
+    def SecondLang(self, url, ilist): return ilist
