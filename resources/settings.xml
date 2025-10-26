@@ -4,7 +4,11 @@
                  type="enum" 
                  label="Content Language" 
                  values="English|日本語 (Japanese)|中文（简体）(Chinese Simplified)|中文（繁體）(Chinese Traditional)|हिन्दी (Hindi)|العربية (Arabic)|ภาษาไทย (Thai)|မြန်မာဘာသာစကား (Burmese)|Español (Spanish)|Français (French)|Русский (Russian)|Português (Portuguese)|한국어 (Korean)|Українська (Ukrainian)|Bahasa Indonesia (Indonesian)|Türkçe (Turkey)|Tiếng Việt (Vietnamese)" 
-                 default="English" />
+                 default="16" />
         <setting id="usecolor" type="bool" label="Use Color in Main Menu" default="true" />
+        <setting id="view_by_tokyo"
+                 type="bool"
+                 label="View schedule by Tokyo time (JST)"
+                 default="false" />
     </category>
 </settings>
