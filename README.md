@@ -14,7 +14,7 @@ This addon retrieves official NHK World content from public NHK APIs, with multi
 - 🌐 **Multilingual Interface** — Choose from 15+ supported languages  
 - 🧩 **CoreELEC / LibreELEC Compatible** — Optimized for embedded Kodi systems
  
-## 🆕 **Schedule (Live TV & Catchup)
+## 🆕 Schedule (Live TV & Catchup)
 The **Schedule** section displays NHK World’s daily programming guide, including both upcoming and past programs.
 - **Features:**
   - Lists programs by **time range** (e.g. `10:00–10:30 NHK NEWSLINE`)
