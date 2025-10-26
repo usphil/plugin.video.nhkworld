@@ -97,6 +97,7 @@ Added News by region and Top News
 Added Multilingual UI and font switching logic
 Added Smart Search (auto-play videos)
 Code cleanup and optimized load speed
+
 🧾 Changelog
 v1.1.0  
 Added Lastest Shows, Trending
