@@ -317,32 +317,41 @@ class myAddon(helper.myAddon):
             xbmcgui.Dialog().notification("NHK Live", f"Delete failed: {e}", xbmcgui.NOTIFICATION_ERROR, 3000)
 
     def get_live_stream(self):
-        """Prefer 1080p live stream (media-tyo), fallback to parsed link"""
+        """
+        Always prefer 1080p live stream (media-tyo),
+        fallback to parsed JS link,
+        final fallback to static master link.
+        """
         headers = {
             "User-Agent": self.defaultHeaders["User-Agent"],
             "Referer": "https://www3.nhk.or.jp/nhkworld/en/live_tv/",
         }
         primary_url = "https://media-tyo.hls.nhkworld.jp/hls/w/live/o-master.m3u8"
         try:
-            test = requests.head(primary_url, headers=headers, timeout=5)
-            if test.status_code == 200:
+            r = requests.get(primary_url, headers=headers, timeout=10, stream=True)
+            if r.status_code in (200, 206):
                 return primary_url
         except Exception as e:
-            logs(f"1080p link failed: {e}")
+            logs(f"❌ 1080p request failed: {e}")
 
         try:
+            logs("Trying to parse JS for live stream...")
             js_url = "https://www3.nhk.or.jp/nhkworld/common/assets/live/js/main.js"
             js_text = requests.get(js_url, headers=headers, timeout=10).text
+
             base_url = xsearch(r'const s=`(.*?)/(master.m3u8|o-master.m3u8)`', js_text)
             if base_url:
                 fallback_url = "https://" + base_url.replace("${t}", "w") + "/o-master.m3u8"
-                logs(f"Fallback to parsed live stream: {fallback_url}")
+                logs(f"Parsed JS fallback: {fallback_url}")
                 return fallback_url
+            else:
+                logs("JS parse failed: pattern not found")
+
         except Exception as e:
-            logs(f"Fallback parse failed: {e}")
+            logs(f"❌ JS parse error: {e}")
 
         final_url = "https://masterpl.hls.nhkworld.jp/hls/w/live/master.m3u8"
-        logs(f"Fallback to static URL: {final_url}")
+        logs(f"Using static fallback: {final_url}")
         return final_url
 
     # ========== MAIN MENU ==========
