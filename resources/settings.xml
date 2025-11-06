@@ -2,13 +2,54 @@
     <category label="General">
         <setting id="language" 
                  type="enum" 
-                 label="Content Language" 
-                 values="English|日本語 (Japanese)|中文（简体）(Chinese Simplified)|中文（繁體）(Chinese Traditional)|हिन्दी (Hindi)|العربية (Arabic)|ภาษาไทย (Thai)|မြန်မာဘာသာစကား (Burmese)|Español (Spanish)|Français (French)|Русский (Russian)|Português (Portuguese)|한국어 (Korean)|Українська (Ukrainian)|Bahasa Indonesia (Indonesian)|Türkçe (Turkey)|Tiếng Việt (Vietnamese)" 
+                 label="Second Content Language" 
+                 values="English|日本語 (Japanese)|中文（简体）(Chinese Simplified)|中文（繁體）(Chinese Traditional)|हिन्दी (Hindi)|العربية (Arabic)|ภาษาไทย (Thai)|မြန်မာဘာသာစကား (Burmese)|Español (Spanish)|Français (French)|Русский (Russian)|Português (Portuguese)|한국어 (Korean)|Українська (Ukrainian)|Bahasa Indonesia (Indonesian)|Türkçe (Turkish)|Tiếng Việt (Vietnamese)" 
                  default="16" />
-        <setting id="usecolor" type="bool" label="Use Color in Main Menu" default="true" />
+
+        <setting id="usecolor" 
+                 type="bool" 
+                 label="Use color in main menu" 
+                 default="true" />
+
         <setting id="view_by_tokyo"
                  type="bool"
-                 label="View schedule by Tokyo time (JST)"
+                 label="Show schedule by Tokyo time (JST)"
                  default="false" />
+                         
+        <setting id="days_past"
+                 type="number"
+                 label="Number of past days (Catch-up)"
+                 default="3"
+                 range="0,30"
+                 step="1"
+                 option="spinner" />
+
+        <setting id="days_future"
+                 type="number"
+                 label="Number of upcoming days"
+                 default="1"
+                 range="0,30"
+                 step="1"
+                 option="spinner" />
+     </category>
+     
+    <category label="Live Auto Focus">
+        <setting id="info_display_note"
+                 type="lsep"
+                 label="[B]Options to help the addon automatically focus on the LIVE program[/B]" />
+
+        <setting id="view_mode"
+                 type="labelenum"
+                 label="Your preferred view mode"
+                 values="List (50)|WideList (55)|Poster (51)|Shift (53)|InfoWall (54)|FanArt (502)|SlimList (516)"
+                 default="List (50)" />
+
+        <setting id="custom_view_mode"
+                 type="number"
+                 label="Or enter a custom View Mode ID"
+                 default=""
+                 range="0,9999"
+                 step="1"
+                 option="input" />
     </category>
 </settings>
