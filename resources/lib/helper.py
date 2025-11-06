@@ -122,7 +122,7 @@ class myAddon(object):
             except Exception as e:
                 xbmc.log(f"[NHK] Focus move failed: {e}", xbmc.LOGERROR)
                 
-        xbmc.executebuiltin('Container.SetViewMode(516)')  # for Titan Skin
+        # xbmc.executebuiltin('Container.SetViewMode(516)')  # for Titan Skin
 
     def procDir(self, func, url, ctype):
         ilist = []
