@@ -354,6 +354,7 @@ class myAddon(helper.myAddon):
         logs(f"Using static fallback: {final_url}")
         return final_url
 
+
     # ========== MAIN MENU ==========
 
     def MainMenu(self, url, ilist):
@@ -873,28 +874,33 @@ class myAddon(helper.myAddon):
             return
 
         url_1080 = url.replace("/master.m3u8", "/o-master.m3u8")
-        test = requests.head(url_1080, headers=self.defaultHeaders, timeout=5, allow_redirects=True)
-        if test.status_code == 200: 
+
+        def check_url(u):
+            try:
+                r = requests.get(u, headers=self.defaultHeaders, timeout=5, stream=True)
+                return r.status_code in (200, 206)
+            except:
+                return False
+
+        if check_url(url_1080):
             url = url_1080
-                
-        try:
-            test = requests.head(url, headers=self.defaultHeaders, timeout=5, allow_redirects=True) #Check again for links that are not yet live in the schedule
-            if test.status_code == 200: 
-                liz = xbmcgui.ListItem(path=url, offscreen=True)
-                liz.setProperty("inputstream", "inputstream.adaptive")
-                liz.setMimeType("application/x-mpegURL")
-                xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, liz)
-            else:
-                xbmcgui.Dialog().notification(
-                    "NHK Live",
-                    "This program is not yet available.",
-                    xbmcgui.NOTIFICATION_INFO,
-                    3000
-                )
-                return
-        except Exception as e:
-            xbmcgui.Dialog().notification("NHK Live", f"Connection error: {e}", xbmcgui.NOTIFICATION_ERROR, 3000)
+
+        # #Check the main link again (the schedule is sometimes not live yet)
+        if check_url(url):
+            logs(f"URL: {url}")
+            liz = xbmcgui.ListItem(path=url, offscreen=True)
+            liz.setProperty("inputstream", "inputstream.adaptive")
+            liz.setMimeType("application/x-mpegURL")
+            xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, liz)
             return
+
+        # If still not live
+        xbmcgui.Dialog().notification(
+            "NHK Live",
+            "This program is not yet available.",
+            xbmcgui.NOTIFICATION_INFO,
+            3000
+        )
 
     def PlayNews(self, url):
         if ".m3u8" in url:
@@ -914,8 +920,8 @@ class myAddon(helper.myAddon):
  
         try:
             m3u8_720 = m3u8_url.replace("_HQ/index.m3u8", "_2M/index.m3u8")
-            test = requests.head(m3u8_720, headers=self.defaultHeaders, timeout=5)
-            if test.status_code == 200:
+            r = requests.get(m3u8_720, headers=self.defaultHeaders, timeout=5, stream=True)
+            if r.status_code in (200, 206):
                 m3u8_url = m3u8_720
         except Exception as e:
             logs(f"720p link failed: {e}")
