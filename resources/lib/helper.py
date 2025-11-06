@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys, xbmc, xbmcgui, xbmcplugin, xbmcaddon, urllib.parse
+import sys, xbmc, xbmcgui, xbmcplugin, xbmcaddon, re, urllib.parse
 
 class myAddon(object):
     def __init__(self):
@@ -99,18 +99,46 @@ class myAddon(object):
         ilist.append((u, liz, isFolder))
         return ilist
 
-    def endDirectory(self, ilist):
-        xbmcplugin.addDirectoryItems(int(sys.argv[1]), ilist, len(ilist))
-        xbmcplugin.setContent(int(sys.argv[1]), 'videos')
-        xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=False)
-        # xbmc.executebuiltin('Container.SetViewMode(516)')  # for Titan Skin
+    def endDirectory(self, ilist, live_index=None):
+        handle = int(sys.argv[1])
+        xbmcplugin.addDirectoryItems(handle, ilist, len(ilist))
+        xbmcplugin.setContent(handle, 'videos')
+        xbmcplugin.endOfDirectory(handle, cacheToDisc=False)
+
+        if live_index is not None:
+            ADDON = self.addon
+
+            view_mode_label = ADDON.getSetting("view_mode")
+            match = re.search(r'\((\d+)\)', view_mode_label)
+            container_id = int(match.group(1)) if match else 50
+
+            custom_id = ADDON.getSetting("custom_view_mode")
+            if custom_id.strip() != "0":
+                container_id = int(custom_id)
+               
+            try:
+                xbmc.sleep(600)
+                xbmc.executebuiltin(f'Control.SetFocus({container_id}, {live_index}, absolute)')
+            except Exception as e:
+                xbmc.log(f"[NHK] Focus move failed: {e}", xbmc.LOGERROR)
+                
+        xbmc.executebuiltin('Container.SetViewMode(516)')  # for Titan Skin
 
     def procDir(self, func, url, ctype):
         ilist = []
-        ilist = func(url, ilist)
+        result = func(url, ilist)
+
+        # If func return tuple (ilist, live_index)
+        if isinstance(result, tuple):
+            ilist, live_index = result
+        else:
+            ilist = result
+            live_index = None
+
         if ilist is None:
             ilist = []
-        self.endDirectory(ilist)
+
+        self.endDirectory(ilist, live_index)
 
     def processAddonEvent(self):
         mtable = {
@@ -136,6 +164,7 @@ class myAddon(object):
             'PLAY_NEWS': self.PlayNews,
             'PLAY_EPISODE': self.PlayEpisode,
             'CHANGE_LANG': self.changeLanguageAndFont,
+            'OPEN_SETTINGS': self.openSettings,
         }
         parms = {}
         

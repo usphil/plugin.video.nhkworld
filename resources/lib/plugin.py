@@ -8,9 +8,12 @@ from datetime import datetime, timedelta, timezone
 NHK_BASE = "https://www3.nhk.or.jp"
 API_BASE = "https://api.nhkworld.jp/showsapi/v1/en"
 API_BASE_LANG = f"https://api.nhkworld.jp/showsapi/v1/{lang_code}"
-use_color = addon.getSetting('usecolor')
 HISTORY_FILE = xbmcvfs.translatePath("special://profile/addon_data/plugin.video.nhkworld/search_history.json")
 MAX_HISTORY = 10
+use_color = addon.getSetting('usecolor')
+days_past = int(addon.getSetting("days_past"))
+days_future = int(addon.getSetting("days_future"))+1 #1 replacement for today not listed
+view_by_tokyo = addon.getSetting("view_by_tokyo") == "true"
 
 def color(name,c=''):
     if use_color == "true" :
@@ -85,7 +88,6 @@ class myAddon(helper.myAddon):
                 ilist.append((url, li, True))
 
         return self.endDirectory(ilist)
-
 
     def SearchKeyboard(self, url, ilist):
         """
@@ -266,7 +268,6 @@ class myAddon(helper.myAddon):
             logs(f"Error saving search history: {e}")
             
     def ClearHistory(self, url, ilist):
-
         if xbmcvfs.exists(HISTORY_FILE):
             try:
                 xbmcvfs.delete(HISTORY_FILE)
@@ -294,7 +295,6 @@ class myAddon(helper.myAddon):
         xbmc.executebuiltin(f"Container.Update({sys.argv[0]}?mode=SEARCH_HUB, replace)")
 
     def DeleteKeyword(self, keyword, ilist):
-
         try:
             if not xbmcvfs.exists(HISTORY_FILE):
                 xbmcgui.Dialog().notification("NHK Live", "No search history found.", xbmcgui.NOTIFICATION_INFO, 2000)
@@ -316,14 +316,12 @@ class myAddon(helper.myAddon):
         except Exception as e:
             xbmcgui.Dialog().notification("NHK Live", f"Delete failed: {e}", xbmcgui.NOTIFICATION_ERROR, 3000)
 
-
     def get_live_stream(self):
         """Prefer 1080p live stream (media-tyo), fallback to parsed link"""
         headers = {
             "User-Agent": self.defaultHeaders["User-Agent"],
             "Referer": "https://www3.nhk.or.jp/nhkworld/en/live_tv/",
         }
-
         primary_url = "https://media-tyo.hls.nhkworld.jp/hls/w/live/o-master.m3u8"
         try:
             test = requests.head(primary_url, headers=headers, timeout=5)
@@ -347,8 +345,6 @@ class myAddon(helper.myAddon):
         logs(f"Fallback to static URL: {final_url}")
         return final_url
 
-
-
     # ========== MAIN MENU ==========
 
     def MainMenu(self, url, ilist):
@@ -360,17 +356,17 @@ class myAddon(helper.myAddon):
         info = {"Title": "NHK World Live", "Plot": "Watch NHK World live stream"}
         ilist = self.addVideo(color("Live Now", "green"), "PLAY_EPISODE", ilist, live_url, self.thumb, self.fanart, info)
 
-        info = {"Title": "News", "Plot": "NHK World latest news videos"}
-        ilist = self.addDir(color("Live & Catchup", "green"), "SCHEDULE_DAYS", ilist, "news_in_english", self.thumb, self.thumb, info)
+        info = {"Title": "News", "Plot": "Browse programs through the daily schedule"}
+        ilist = self.addDir(color("Live & Catchup", "green"), "SCHEDULE_ITEMS", ilist, "Today Schedule", self.thumb, self.thumb, info)
 
         info = {"Title": "News", "Plot": "NHK World latest news videos"}
         ilist = self.addDir(color("NHK News", "orange"), "NEWS_MENU", ilist, "news_in_english", self.thumb, self.fanart, info)
 
         programs_url = f"{API_BASE}/video_programs?limit=100&sort=-date"
-        info = {"Title": "Video Programs", "Plot": "Browse NHK World on-demand video programs"}
+        info = {"Title": "Video Programs", "Plot": "Browse NHK World on-demand programs"}
         ilist = self.addDir(color("Latest Shows","orange"), "SHOWS_LIST", ilist, programs_url, self.thumb, self.fanart, info)
 
-        programs_url = f"{API_BASE}/video_programs?limit=10&sort=trending"
+        programs_url = f"{API_BASE}/video_programs?limit=20&sort=trending"
         info = {"Title": "Video Programs", "Plot": "Browse NHK World trending programs"}
         ilist = self.addDir(color("Trending","orange"), "SHOWS_LIST", ilist, programs_url, self.thumb, self.fanart, info)
 
@@ -379,14 +375,20 @@ class myAddon(helper.myAddon):
         ilist = self.addDir(color("Latest Videos", "orange"), "EPISODES_LIST", ilist, videos_url, self.thumb, self.fanart, info)
 
         cat_url = f"{API_BASE}/categories/"
-        info = {"Title": "Categories", "Plot": "Explore NHK World programs by category"}
+        info = {"Title": "Categories", "Plot": "Explore NHK World videos by category"}
         ilist = self.addDir(color("Categories", "orange"), "CATEGORIES", ilist, cat_url, self.thumb, self.fanart, info)
         
         info = {"Title": "Other Languages", "Plot": "Explore NHK World programs in other languages"}
         ilist = self.addDir("Other Languages", "SECOND_LANG", ilist, "url", self.thumb, self.fanart, info)
+        
+        info = {"Title": "Settings", "Plot": "Open the NHK World add-on settings"}
+        ilist = self.addDir(color("Settings", "lime"), "OPEN_SETTINGS", ilist, "settings", self.thumb, self.fanart, info)
 
         return ilist
-
+    
+    def openSettings(self, url):
+        xbmcaddon.Addon().openSettings()
+    
     def SecondLang(self, url, ilist):
         
         info = {"Title": "News", "Plot": "NHK World latest news videos"}
@@ -406,10 +408,11 @@ class myAddon(helper.myAddon):
 
         info = {"Title": "Change Language", "Plot": "Select NHK content language"}
         ilist = self.addDir(color("Change Language", "yellow"), "CHANGE_LANG", ilist, "change_language", self.thumb, self.fanart, info)
-        
 
-        return ilist        
+        return ilist   
+        
     # ========== CATEGORY LIST ==========
+    
     def Categories(self, url, ilist):
         """Display categories"""
         try:
@@ -433,12 +436,11 @@ class myAddon(helper.myAddon):
                 "mediatype": "tvshow",
             }
             ilist = self.addMenuItem(cat_name, "EPISODES_LIST", ilist, cat_api, cat_thumb, cat_fanart, info, isFolder=True)
-
         
         return ilist
 
-
     # ========== PROGRAM LIST ==========
+    
     def ShowsList(self, url, ilist):
         """Display video programs in a category"""
         try:
@@ -465,7 +467,7 @@ class myAddon(helper.myAddon):
             }
             if total_video == 0:
                 continue
-            ilist = self.addMenuItem(title, "EPISODES_LIST", ilist, episodes_api, thumb, fanart, info, isFolder=True)
+            ilist = self.addMenuItem(color(title, 'steelblue'), "EPISODES_LIST", ilist, episodes_api, thumb, fanart, info, isFolder=True)
 
         # --- pagination link ---
         try:
@@ -486,6 +488,7 @@ class myAddon(helper.myAddon):
         return ilist
 
     # ========== EPISODE LIST ==========
+    
     def EpisodesList(self, url, ilist): 
         """Display episodes for a given program"""
         try:
@@ -498,14 +501,14 @@ class myAddon(helper.myAddon):
             show_title = ep.get('video_program')['title']
             title = f'{ep.get("title", "")}  '
             desc = ep.get("description", "")
-            full_title = f"{title}{color(show_title, 'steelblue')}"
+            full_title = f"{title}{color(show_title, 'steelblue')}" if use_color=='true' else f"{title}({show_title})" 
             vid = ep.get("video", {})
             m3u8_url = vid.get("url")
             duration = vid.get("duration", 0)
             aired = ep.get("first_broadcasted_at")
             if aired:
                 try:
-                    aired = datetime.datetime.fromisoformat(aired.replace("Z", "+00:00")).strftime("%Y-%m-%d")
+                    aired = datetime.fromisoformat(aired.replace("Z", "+00:00")).strftime("%Y-%m-%d")
                 except Exception:
                     aired = ""
             thumb = NHK_BASE + ep["images"][1]["url"] if ep.get("images") else self.thumb
@@ -519,7 +522,6 @@ class myAddon(helper.myAddon):
                 "FirstAired": aired,
                 "mediatype": "episode",
             }
-
             li = xbmcgui.ListItem(label=full_title)
             li.setArt({"thumb": thumb, "fanart": fanart})
             li.setInfo("video", info)
@@ -553,7 +555,6 @@ class myAddon(helper.myAddon):
                 ilist = self.addMenuItem(color(f">> Next Page {page+1}/{total_page}", "yellow"), "EPISODES_LIST", ilist, next_url, thumb, thumb, {"Title": "Next Page"}, isFolder=True)
         except:
             logs('No more page')
-
         
         return ilist
 
@@ -621,7 +622,7 @@ class myAddon(helper.myAddon):
                     updated_at = ""
             info = {
                 "Title": title,
-                "Plot": desc  +'\nUpdated at: '+  updated_at,
+                "Plot": desc  +'\n\nUpdated at: '+  updated_at,
                 "studio": "NHK",
                 "mediatype": "video",
             }
@@ -684,37 +685,6 @@ class myAddon(helper.myAddon):
     # ========== SCHEDULE ==========
 
     def ScheduleDays(self, url, ilist):
-        from datetime import datetime, timedelta, timezone
-
-        JST = timezone(timedelta(hours=9))
-        view_by_tokyo = self.addon.getSetting("view_by_tokyo") == "true"
-
-        # Get today's date for both local and Tokyo
-        today_local = datetime.now().date()
-        today_tokyo = datetime.now(JST).date()
-
-        # If user chooses to view by Tokyo → Today will be JST
-        today_ref = today_tokyo if view_by_tokyo else today_local
-
-        for offset in range(-7, 7):
-            day = today_ref + timedelta(days=offset)
-            json_file = day.strftime('%Y%m%d.json')
-            label = day.strftime('%a, %b %d')
-
-            if day == today_local and day == today_tokyo:
-                label = f'[COLOR yellow]{label} (Today)[/COLOR]'
-            elif day == today_local:
-                label = f'[COLOR yellow]{label} (Local Today)[/COLOR]'
-            elif day == today_tokyo:
-                label = f'[COLOR red]{label} (Tokyo Today)[/COLOR]'
-
-            self.addDir(label, "SCHEDULE_ITEMS", ilist,
-                        f"https://masterpl.hls.nhkworld.jp/epg/w/{json_file}",
-                        "", self.addonFanart)
-        
-        return ilist
-
-    def ScheduleItems(self, url, ilist):
 
         JST = timezone(timedelta(hours=9))
         if time.daylight and time.localtime().tm_isdst:
@@ -723,6 +693,64 @@ class myAddon(helper.myAddon):
             local_offset = -time.timezone // 3600
         LOCAL = timezone(timedelta(hours=local_offset))
 
+        # Get today's date for both local and Tokyo
+        today_local = datetime.now(LOCAL).date()
+        today_tokyo = datetime.now(JST).date()
+        
+        # If user chooses to view by Tokyo → Today will be JST
+        today = today_tokyo if view_by_tokyo else today_local
+
+        for offset in range(-days_past, days_future):
+            day = today + timedelta(days=offset) 
+            day_tokyo = today_tokyo + timedelta(days=offset) 
+            json_file = day_tokyo.strftime('%Y%m%d.json')  # always get json in Japanese time
+            label = day.strftime('%a, %b %d')
+
+            if view_by_tokyo:
+                label = (day - timedelta(hours=9)).strftime('%a, %b %d')
+
+            if day == today:
+                # label = f'[COLOR green]{label} (Today)[/COLOR]'
+                # no more today in days list 
+                continue
+                
+            if offset == 1:
+                label = label + " (Tomorrow)"
+            if offset == -1:
+                label = label + " (Yesterday)"
+                
+            self.addDir(label, "SCHEDULE_ITEMS", ilist,
+                        f"https://masterpl.hls.nhkworld.jp/epg/w/{json_file}",
+                        "", self.addonFanart)
+                        
+        return ilist
+
+    def ScheduleItems(self, url, ilist):
+        index_offset = 0
+
+        JST = timezone(timedelta(hours=9))
+        if time.daylight and time.localtime().tm_isdst:
+            local_offset = -time.altzone // 3600
+        else:
+            local_offset = -time.timezone // 3600
+        LOCAL = timezone(timedelta(hours=local_offset))
+
+        if url == "Today Schedule":
+            self.ScheduleDays(url, ilist)
+            
+            index_offset = days_past + days_future 
+
+            # Get today's date for both local and Tokyo
+            today_local = datetime.now(LOCAL).date()
+            today_tokyo = datetime.now(JST).date()
+
+            # If user chooses to view by Tokyo → Today will be JST
+            today = today_tokyo if view_by_tokyo else today_local
+            today_json_file = today_tokyo.strftime('%Y%m%d.json')  # always get json in Japanese time
+            url = f"https://masterpl.hls.nhkworld.jp/epg/w/{today_json_file}"
+
+            ilist = self.addDir(color(f"--------------- Schedule for {today} ---------------", "yellow"), "SCHEDULE_ITEMS", ilist, "Today Schedule", self.thumb, self.fanart)
+        
         try:
             data = requests.get(url, timeout=10).json()
         except Exception as e:
@@ -732,11 +760,17 @@ class myAddon(helper.myAddon):
         now_local = datetime.now(LOCAL)
         now_jst = datetime.now(JST)
         data = data["data"]
-        for prog in data:
+        live_index = None
+        visible_index = 0  # actual location on UI (ilist)
 
+        skip_counts = {"missing_time": 0, "info": 0, "vod_unavailable": 0}
+        for prog in data:
+            
             if not prog.get("startTime") or not prog.get("endTime"):
+                skip_counts["missing_time"] += 1
                 continue
             if prog.get("title") == "INFO":
+                skip_counts["info"] += 1
                 continue
             
             start_jst = datetime.fromisoformat(prog["startTime"].replace('Z', '+09:00')).astimezone(JST)
@@ -744,26 +778,35 @@ class myAddon(helper.myAddon):
             start_local = start_jst.astimezone(LOCAL)
             end_local = end_jst.astimezone(LOCAL)
 
-            label_time = f'{start_local.strftime("%H:%M")}-{end_local.strftime("%H:%M")}'
+            if end_jst < now_jst and prog.get("vodFlag") == 0:
+                skip_counts["vod_unavailable"] += 1
+                continue
+            
+            if index_offset > 0:
+                label_time = f'{start_jst.strftime("%I:%M %p")}' if view_by_tokyo else f'{start_local.strftime("%I:%M %p")}'
+            else:
+                label_time = f'{start_jst.strftime("%b %d  %I:%M %p")}' if view_by_tokyo else f'{start_local.strftime("%b %d  %I:%M %p")}'
+                    
             C = 'lightgrey'
             livenow = ""
-
+            
             if end_jst < now_jst:
-                C = 'lime'
+                C = 'lightgreen'
                 if prog.get("vodFlag") == 0:
                     continue
             elif start_jst <= now_jst <= end_jst:
-                C = 'cyan'
+                C = 'yellow'
                 livenow = color("[B]LIVE NOW:[/B] ", "red")
-
+                live_index = visible_index  # <-- Index on UI!
+                
             title = prog.get("title", "").strip()
             episode = prog.get("episodeTitle", "").strip()
             if episode:
-                title_full = f"{episode}  [COLOR red]{title}[/COLOR]"
+                title_full = f"{episode}  [COLOR steelblue]{title}[/COLOR]"
             else:
                 title_full = f"[COLOR red]{title}[/COLOR]"
 
-            label = f'[COLOR {C}]{label_time}  [/COLOR]{title_full}'
+            label = f'[COLOR {C}]{label_time}[/COLOR]  {title_full}'
 
             thumb = prog.get("episodeThumbnailURL") or prog.get("thumbnail") \
                     or "https://filedn.com/lXWPrdig44P7DGUkOEDrKLm/nhk/nhk_newsline.jpg"
@@ -799,8 +842,17 @@ class myAddon(helper.myAddon):
             
             u = f"{sys.argv[0]}?mode=PLAY_EPISODE&url={urllib.parse.quote_plus(m3u8_url)}"
             ilist.append((u, li, False))
+            visible_index += 1
 
-        return ilist
+        try:
+            logs(f"Skipped: {skip_counts}, live_index_on_UI={live_index}")
+        except: pass
+        
+        if live_index:
+            live_index = live_index+index_offset
+        else:
+            live_index = index_offset
+        return ilist, live_index
 
     # ========== PLAY VIDEO ==========
     
