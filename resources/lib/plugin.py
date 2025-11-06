@@ -332,7 +332,7 @@ class myAddon(helper.myAddon):
             if r.status_code in (200, 206):
                 return primary_url
         except Exception as e:
-            logs(f"❌ 1080p request failed: {e}")
+            logs(f"1080p request failed: {e}")
 
         try:
             logs("Trying to parse JS for live stream...")
@@ -348,7 +348,7 @@ class myAddon(helper.myAddon):
                 logs("JS parse failed: pattern not found")
 
         except Exception as e:
-            logs(f"❌ JS parse error: {e}")
+            logs(f"JS parse error: {e}")
 
         final_url = "https://masterpl.hls.nhkworld.jp/hls/w/live/master.m3u8"
         logs(f"Using static fallback: {final_url}")
