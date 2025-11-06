@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.nhkworld"
        name="NHK World"
-       version="1.1.0"
+       version="1.1.1"
        provider-name="usphil">
     <requires>
         <import addon="xbmc.python" version="3.0.0" />
@@ -31,6 +31,10 @@
             v1.0.0 — Initial release (Live TV, Programs, News, Search, Multilingual)
             v1.0.1 — Lastest Shows, Trending added
             v1.1.0 — Search both Shows and News. Live &amp; Catch Up  added
+            v1.1.1 — Remove Live Now
+                          Live &amp; Catch Ups will go straight to today's schedule and focus on the live stream, ViewList (50) is required by default (can be changed in settings)
+                          Improved the display between Tokyo time and local time.
+                          The schedule is based entirely in Tokyo time but will display the local date and time by default (change to Tokyo time in settings)
         </news>
     </extension>
 </addon>
