@@ -799,6 +799,7 @@ class myAddon(helper.myAddon):
                     
             C = 'lightgrey'
             livenow = ""
+            m3u8_url = prog.get("playURL", "") 
             
             if end_jst < now_jst:
                 C = 'lightgreen'
@@ -808,6 +809,7 @@ class myAddon(helper.myAddon):
                 C = 'yellow'
                 livenow = color("[B]LIVE NOW:[/B] ", "red")
                 live_index = visible_index  # <-- Index on UI!
+                m3u8_url = self.get_live_stream()
                 
             title = prog.get("title", "").strip()
             episode = prog.get("episodeTitle", "").strip()
@@ -827,8 +829,6 @@ class myAddon(helper.myAddon):
                 "studio": "NHK",
                 "mediatype": "video",
             }
-
-            m3u8_url = prog.get("playURL", "")
 
             li = xbmcgui.ListItem(label=label)
             li.setArt({"thumb": thumb, "fanart": thumb})
